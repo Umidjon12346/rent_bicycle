@@ -1,5 +1,9 @@
 const { errorHandler } = require("../helpers/error.handler");
+const Card = require("../models/card.model");
 const Client = require("../models/client.model");
+const jwtService = require("../services/jwt.service");
+const bcrypt = require('bcrypt');
+const config = require('config');
 
 const addClient = async (req, res) => {
   try {
@@ -13,13 +17,15 @@ const addClient = async (req, res) => {
       refresh_token,
       is_active,
     } = req.body;
+
+    const hashedpassword = bcrypt.hashSync(password, 7);
     const newClient = await Client.create({
       first_name,
       last_name,
       phone,
       passport,
       email,
-      password,
+      password:hashedpassword,
       refresh_token,
       is_active,
     });
@@ -91,10 +97,47 @@ const deleteClient = async (req, res) => {
   }
 };
 
+const loginClient = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const client = await Client.findOne({ where: { email } });
+    if (!client) {
+      return res.status(400).send({ message: "Client not found" });
+    }
+    const valuePas = bcrypt.compareSync(password, client.password);
+    if (!valuePas) {
+      return res.status(400).send({ message: "Invalid password" });
+    }
+
+    const payload = {
+      id: client.id,
+      email: client.email,
+      is_active: client.is_active
+    };
+
+    const tokens = jwtService.generateTokens(payload);
+    client.refresh_token = tokens.refreshToken;
+    await client.save();
+    res.cookie("refreshToken", tokens.refreshToken, {
+      httpOnly: true,
+      maxAge: config.get("refresh_cookie_time"),
+    });
+    console.log(req.cookies);
+
+    res
+      .status(200)
+      .send({ message: "Login successful", accessToken: tokens.accessToken });
+  } catch (error) {
+    errorHandler(error, res);
+  }
+};
+
 module.exports = {
     addClient,
     getAllClients,
     getClientById,
     deleteClient,
-    updateClient
+    updateClient,
+    loginClient
 }

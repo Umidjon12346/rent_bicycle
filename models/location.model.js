@@ -22,19 +22,11 @@ const Location = sequelize.define("location", {
       type: DataTypes.DATE,
       allowNull: true,
     },
-    client_id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-    },
-    product_id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-    },
   });
 
 
 Location.belongsTo(Product, { foreignKey: "product_id" });
-Product.hasMany(models.Location, { foreignKey: "product_id" });
+Product.hasMany(Location, { foreignKey: "product_id" });
 
 Location.belongsTo(Client, { foreignKey: "client_id" });
 Client.hasMany(Location)

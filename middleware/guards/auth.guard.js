@@ -1,7 +1,7 @@
-const errorHandler = require("../../helpers/error.handler");
 const jwt = require("jsonwebtoken");
 const config = require("config");
 const jwtService = require("../../services/jwt.service");
+const { errorHandler } = require("../../helpers/error.handler");
 
 module.exports = async function (req, res, next) {
   try {

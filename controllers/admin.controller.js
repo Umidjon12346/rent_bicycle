@@ -1,14 +1,19 @@
 const { errorHandler } = require("../helpers/error.handler");
 const Admin = require("../models/admin.model");
+const bcrypt = require("bcrypt");
+const config = require("config");
+const jwtService = require("../services/jwt.service");
 
 const addAdmin = async (req, res) => {
   try {
     const { full_name, email, password, refresh_token, is_creator, is_active } =
       req.body;
+
+    const hashedpassword = bcrypt.hashSync(password, 7);
     const newAdmin = await Admin.create({
       full_name,
       email,
-      password,
+      password: hashedpassword,
       refresh_token,
       is_creator,
       is_active,
@@ -64,10 +69,110 @@ const deleteAdmin = async (req, res) => {
   }
 };
 
+const loginAdmin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const admin = await Admin.findOne({ where: { email } });
+    if (!admin) {
+      return res.status(400).send({ message: "Admin not found" });
+    }
+    const valuePas = bcrypt.compareSync(password, admin.password);
+    if (!valuePas) {
+      return res.status(400).send({ message: "Invalid password" });
+    }
+
+    const payload = {
+      id: admin.id,
+      email: admin.email,
+      is_active: admin.is_active,
+      is_creator:admin.is_creator
+    };
+
+    const tokens = jwtService.generateTokens(payload);
+    admin.refresh_token = tokens.refreshToken;
+    await admin.save();
+    res.cookie("adminRefreshToken", tokens.refreshToken, {
+      httpOnly: true,
+      maxAge: config.get("refresh_cookie_time"),
+    });
+    console.log(req.cookies);
+
+    res
+      .status(200)
+      .send({ message: "Login successful", accessToken: tokens.accessToken });
+  } catch (error) {
+    errorHandler(error, res);
+  }
+};
+
+const logoutAdmin = async (req, res) => {
+  try {
+    const { adminRefreshToken } = req.cookies;
+    console.log(adminRefreshToken);
+
+    if (!adminRefreshToken) {
+      return res.status(400).send({ message: "Token not provided" });
+    }
+
+    const admin = await Admin.findOne({
+      where: { refresh_token: adminRefreshToken },
+    });
+    if (!admin) {
+      return res.status(400).send({ message: "Invalid token" });
+    }
+
+    admin.refresh_token = "";
+    await admin.save();
+
+    res.clearCookie("adminRefreshToken");
+    res.send({ message: "Admin logout successful" });
+  } catch (error) {
+    errorHandler(error, res);
+  }
+};
+
+const refreshTokenAdmin = async (req, res) => {
+  try {
+    const { adminRefreshToken } = req.cookies;
+    console.log(adminRefreshToken);
+
+    if (!adminRefreshToken) {
+      return res.status(400).send({ message: "Tokening yoqqqkuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu" });
+    }
+
+    const user = await Admin.findOne({
+      where: { refresh_token: adminRefreshToken },
+    });
+    if (!user) {
+      return res.status(400).send({ message: "bunday tokenligi yoqqq" });
+    }
+    const payload = {
+      id: user._id,
+      phone_number: user.phone_number,
+      role: user.role,
+    };
+
+    const tokens = jwtService.generateTokens(payload);
+    user.refresh_token = tokens.refreshToken;
+    await user.save();
+    res.cookie("adminRefreshToken", tokens.refreshToken, {
+      httpOnly: true,
+      maxAge: config.get("refresh_cookie_time"),
+    });
+    res.status(200).send({ message: "Yangi", accessToken: tokens.accessToken });
+  } catch (error) {
+    errorHandler(error, res);
+  }
+};
+
 module.exports = {
-    addAdmin,
-    getAllAdmins,
-    getAdminById,
-    deleteAdmin,
-    updateAdmin
-}
+  addAdmin,
+  getAllAdmins,
+  getAdminById,
+  deleteAdmin,
+  updateAdmin,
+  loginAdmin,
+  logoutAdmin,
+  refreshTokenAdmin
+};

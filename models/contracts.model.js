@@ -3,6 +3,7 @@ const sequelize = require("../config/db");
 const Product = require("./product.model");
 const RentDuration = require("./rentduration.model");
 const Client = require("./client.model");
+const Status = require("./status.model");
 
 const Contract = sequelize.define("contract", {
     id: {
@@ -49,5 +50,8 @@ RentDuration.hasMany(Contract, { foreignKey: "duration_id" });
 
 Contract.belongsTo(Client,{foreignKey:"client_id"})
 Client.hasMany(Contract)
+
+Contract.belongsTo(Status,{foreignKey:"status_id"})
+Status.hasOne(Contract)
 
 module.exports = Contract;

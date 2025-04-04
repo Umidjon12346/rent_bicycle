@@ -1,6 +1,6 @@
 const express = require("express");
 const config = require("config");
-// const mainRoute = require("./routes/index.routes");
+const mainRoute = require("./routes/index.routes");
 const cookieParser = require("cookie-parser");
 const sequelize = require("./config/db");
 
@@ -10,7 +10,7 @@ const app = express();
 app.use(cookieParser());
 
 app.use(express.json());
-// app.use("/api", mainRoute);
+app.use("/api", mainRoute);
 
 async function start() {
   try {

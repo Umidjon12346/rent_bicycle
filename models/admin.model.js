@@ -22,7 +22,7 @@ const Admin = sequelize.define(
       allowNull: false,
     },
     refresh_token: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.STRING,
       allowNull: true,
     },
     is_creator: {

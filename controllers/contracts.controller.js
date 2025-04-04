@@ -46,7 +46,7 @@ const getContractById = async (req, res) => {
   try {
     const { id } = req.params;
     const contract = await Contract.findByPk(id, {
-      include: [Product, RentDuration],
+      include: [Product, RentDuration,Client],
     });
     res.status(200).send({ contract });
   } catch (error) {

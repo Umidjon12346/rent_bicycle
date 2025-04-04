@@ -1,8 +1,7 @@
-const errorHandler = (error,res)=>{
-    console.log(error);
-    res.status(400).send({error:error.message})
-}
+const logger = require("../services/logger.service");
 
-module.exports = {
-    errorHandler
-}
+const errorHandler = (error, res) => {
+  logger.log(error);
+  res.status(400).send({ error: error.message });
+};
+module.exports = errorHandler;

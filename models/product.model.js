@@ -1,19 +1,13 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
+const Owner = require("./owner.model");
+const Category = require("./category.model");
 
 const Product = sequelize.define("product", {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
-    },
-    owner_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    category_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
     },
     model: {
       type: DataTypes.STRING,
@@ -25,7 +19,10 @@ const Product = sequelize.define("product", {
     },
   });
 
+Product.belongsTo(Owner,{foreignKey:"owner_id"})
+Owner.hasMany(Product)
 
+Product.belongsTo(Category,{foreignKey:"category_id"})
+Category.hasMany(Product)
 
-
-  module.exports = Product;
+module.exports = Product;

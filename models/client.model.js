@@ -30,10 +30,6 @@ const Client = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    card: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-    },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
