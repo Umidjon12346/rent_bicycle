@@ -1,0 +1,14 @@
+{
+  "port": 3003,
+  "db_host": "localhost",
+  "db_username": "postgres",
+  "db_password": "123",
+  "db_port": 5432,
+  "db_name": "bicycle_rent",
+  "expiration_minute": 3,
+  "access_key": "UserAccessTokenKey",
+  "refresh_key": "UserRefreshTokenKey",
+  "access_time": "15s",
+  "refresh_time": "30s",
+  "refresh_cookie_time": 1296000000
+}
