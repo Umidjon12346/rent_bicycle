@@ -1,11 +1,17 @@
-const { errorHandler } = require("../helpers/error.handler");
+const  errorHandler  = require("../helpers/error.handler");
 const Category = require("../models/category.model");
 const Owner = require("../models/owner.model");
 const Product = require("../models/product.model");
+const { productValidation } = require("../validation/product.validation");
 
 const addProduct = async (req, res) => {
   try {
-    const { owner_id, category_id, model, status } = req.body;
+    const { error, value } = productValidation(req.body);
+    console.log(error);
+    if (error) {
+      return res.status(400).send({ message: error.details[0].message });
+    }
+    const { owner_id, category_id, model, status } = value;
     const newProduct = await Product.create({
       owner_id,
       category_id,
@@ -40,7 +46,12 @@ const getProductById = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { owner_id, category_id, model, status } = req.body;
+    const { error, value } = productValidation(req.body);
+    console.log(error);
+    if (error) {
+      return res.status(400).send({ message: error.details[0].message });
+    }
+    const { owner_id, category_id, model, status } = value;
 
     await Product.update(
       {

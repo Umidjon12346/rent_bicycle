@@ -8,7 +8,7 @@ module.exports = async function (req, res, next) {
     const authorization = req.headers.authorization;
     
     if (!authorization) {
-      return res.status(403).send({ meesage: "yaxshilab qara" });
+      return res.status(403).send({ meesage: "Token yoqkuuu yaxshilab qara" });
     }
     const bearer = authorization.split(" ")[0];
     const token = authorization.split(" ")[1];

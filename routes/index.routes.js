@@ -11,6 +11,7 @@ const productRoute = require("./product.routes")
 const rentDurationRoute = require("./rentduration.routes")
 const reviewRoute = require("./review.routes")
 const statusRoute = require("./status.routes")
+const categoryRoute = require("./category.routes")
 
 
 router.use("/admin",adminRoute)
@@ -24,5 +25,6 @@ router.use("/product",productRoute)
 router.use("/rentdura",rentDurationRoute)
 router.use("/review",reviewRoute)
 router.use("/status",statusRoute)
+router.use("/category",categoryRoute)
 
 module.exports = router

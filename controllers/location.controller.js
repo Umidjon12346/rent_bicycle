@@ -1,12 +1,18 @@
-const { errorHandler } = require("../helpers/error.handler");
+const  errorHandler  = require("../helpers/error.handler");
 const Location = require("../models/location.model");
 const Product = require("../models/product.model");
 const Client = require("../models/client.model");
+const { locationValidation } = require("../validation/location.validation");
 
 const addLocation = async (req, res) => {
   try {
+     const { error, value } = locationValidation(req.body);
+        console.log(error);
+        if (error) {
+          return res.status(400).send({ message: error.details[0].message });
+        }
     const { latitude, longitude, recorded_at, client_id, product_id } =
-      req.body;
+      value;
     const newLocation = await Location.create({
       latitude,
       longitude,
@@ -46,8 +52,12 @@ const getLocationById = async (req, res) => {
 const updateLocation = async (req, res) => {
   try {
     const { id } = req.params;
-    const { latitude, longitude, recorded_at, client_id, product_id } =
-      req.body;
+    const { error, value } = locationValidation(req.body);
+    console.log(error);
+    if (error) {
+      return res.status(400).send({ message: error.details[0].message });
+    }
+    const { latitude, longitude, recorded_at, client_id, product_id } = value;
 
     await Location.update(
       {

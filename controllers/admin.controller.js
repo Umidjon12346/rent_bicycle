@@ -1,13 +1,19 @@
-const { errorHandler } = require("../helpers/error.handler");
+const errorHandler = require("../helpers/error.handler");
 const Admin = require("../models/admin.model");
 const bcrypt = require("bcrypt");
 const config = require("config");
 const jwtService = require("../services/jwt.service");
+const { adminValidation } = require("../validation/admin.validation");
 
 const addAdmin = async (req, res) => {
   try {
+    const { error, value } = adminValidation(req.body);
+    console.log(error);
+    if (error) {
+      return res.status(400).send({ message: error.details[0].message });
+    }
     const { full_name, email, password, refresh_token, is_creator, is_active } =
-      req.body;
+      value;
 
     const hashedpassword = bcrypt.hashSync(password, 7);
     const newAdmin = await Admin.create({
@@ -46,8 +52,13 @@ const getAdminById = async (req, res) => {
 const updateAdmin = async (req, res) => {
   try {
     const { id } = req.params;
+    const { error, value } = adminValidation(req.body);
+    console.log(error);
+    if (error) {
+      return res.status(400).send({ message: error.details[0].message });
+    }
     const { full_name, email, password, refresh_token, is_creator, is_active } =
-      req.body;
+      value;
 
     await Admin.update(
       { full_name, email, password, refresh_token, is_creator, is_active },
@@ -86,7 +97,8 @@ const loginAdmin = async (req, res) => {
       id: admin.id,
       email: admin.email,
       is_active: admin.is_active,
-      is_creator:admin.is_creator
+      is_creator: admin.is_creator,
+      role: "admin",
     };
 
     const tokens = jwtService.generateTokens(payload);
@@ -138,24 +150,28 @@ const refreshTokenAdmin = async (req, res) => {
     console.log(adminRefreshToken);
 
     if (!adminRefreshToken) {
-      return res.status(400).send({ message: "Tokening yoqqqkuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu" });
+      return res
+        .status(400)
+        .send({ message: "Tokening yoqqqkuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu" });
     }
 
-    const user = await Admin.findOne({
+    const admin = await Admin.findOne({
       where: { refresh_token: adminRefreshToken },
     });
-    if (!user) {
+    if (!admin) {
       return res.status(400).send({ message: "bunday tokenligi yoqqq" });
     }
     const payload = {
-      id: user._id,
-      phone_number: user.phone_number,
-      role: user.role,
+      id: admin.id,
+      email: admin.email,
+      is_active: admin.is_active,
+      is_creator: admin.is_creator,
+      role: "admin",
     };
 
     const tokens = jwtService.generateTokens(payload);
-    user.refresh_token = tokens.refreshToken;
-    await user.save();
+    admin.refresh_token = tokens.refreshToken;
+    await admin.save();
     res.cookie("adminRefreshToken", tokens.refreshToken, {
       httpOnly: true,
       maxAge: config.get("refresh_cookie_time"),
@@ -174,5 +190,5 @@ module.exports = {
   updateAdmin,
   loginAdmin,
   logoutAdmin,
-  refreshTokenAdmin
+  refreshTokenAdmin,
 };

@@ -1,9 +1,15 @@
-const { errorHandler } = require("../helpers/error.handler");
+const  errorHandler  = require("../helpers/error.handler");
 const RentDuration = require("../models/rentduration.model");
+const { rentDurationValidation } = require("../validation/rentduration.validation");
 
 const addRentDuration = async (req, res) => {
   try {
-    const { duration, duration_type, price } = req.body;
+    const { error, value } = rentDurationValidation(req.body);
+    console.log(error);
+    if (error) {
+      return res.status(400).send({ message: error.details[0].message });
+    }
+    const { duration, duration_type, price } = value;
     const newRentDuration = await RentDuration.create({
       duration,
       duration_type,
@@ -37,7 +43,12 @@ const getRentDurationById = async (req, res) => {
 const updateRentDuration = async (req, res) => {
   try {
     const { id } = req.params;
-    const { duration, duration_type, price } = req.body;
+    const { error, value } = rentDurationValidation(req.body);
+    console.log(error);
+    if (error) {
+      return res.status(400).send({ message: error.details[0].message });
+    }
+    const { duration, duration_type, price } = value;
 
     await RentDuration.update(
       {

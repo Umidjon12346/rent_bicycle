@@ -1,2 +1,3 @@
 node_modules
-./config/deault.json
+config/default.json
+log

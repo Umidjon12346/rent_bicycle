@@ -40,8 +40,11 @@ const Client = sequelize.define(
     },
     is_active: {
       type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      defaultValue: false,
     },
+    activation_link:{
+      type:DataTypes.STRING
+    }
   },
   {
     freezeTableName:true,

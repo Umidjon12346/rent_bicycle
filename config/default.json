@@ -10,5 +10,10 @@
   "refresh_key": "UserRefreshTokenKey",
   "access_time": "15h",
   "refresh_time": "30d",
-  "refresh_cookie_time": 1296000000
+  "refresh_cookie_time": 1296000000,
+  "smtp_password": "ujknefzknsiotenn",
+  "smtp_host": "smtp.gmail.com",
+  "smtp_port": 587,
+  "smtp_user": "umidshari456@gmail.com",
+  "api_url": "http://localhost:3003"
 }

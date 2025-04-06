@@ -1,11 +1,17 @@
-const { errorHandler } = require("../helpers/error.handler");
+const errorHandler = require("../helpers/error.handler");
 const Review = require("../models/review.model");
 const Client = require("../models/client.model");
 const Product = require("../models/product.model");
+const { reviewValidation } = require("../validation/review.validation");
 
 const addReview = async (req, res) => {
   try {
-    const { client_id, product_id, rating, comment } = req.body;
+    const { error, value } = reviewValidation(req.body);
+    console.log(error);
+    if (error) {
+      return res.status(400).send({ message: error.details[0].message });
+    }
+    const { client_id, product_id, rating, comment } = value;
     const newReview = await Review.create({
       client_id,
       product_id,
@@ -43,9 +49,14 @@ const getReviewById = async (req, res) => {
 
 const updateReview = async (req, res) => {
   try {
+    const { error, value } = reviewValidation(req.body);
+    console.log(error);
+    if (error) {
+      return res.status(400).send({ message: error.details[0].message });
+    }
+    const { client_id, product_id, rating, comment } = value;
     const { id } = req.params;
-    const { client_id, product_id, rating, comment } = req.body;
-
+    
     await Review.update(
       {
         client_id,

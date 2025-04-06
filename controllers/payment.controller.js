@@ -1,10 +1,16 @@
-const { errorHandler } = require("../helpers/error.handler");
+const errorHandler = require("../helpers/error.handler");
 const Payment = require("../models/payment.model");
 const Contract = require("../models/contracts.model");
 const Client = require("../models/client.model");
+const { paymentValidation } = require("../validation/payment.validation");
 
 const addPayment = async (req, res) => {
   try {
+    const { error, value } = paymentValidation(req.body);
+    console.log(error);
+    if (error) {
+      return res.status(400).send({ message: error.details[0].message });
+    }
     const {
       client_id,
       contract_id,
@@ -12,7 +18,7 @@ const addPayment = async (req, res) => {
       payment_method,
       payment_time,
       status,
-    } = req.body;
+    } = value;
     const newPayment = await Payment.create({
       client_id,
       contract_id,
@@ -53,6 +59,11 @@ const getPaymentById = async (req, res) => {
 const updatePayment = async (req, res) => {
   try {
     const { id } = req.params;
+    const { error, value } = paymentValidation(req.body);
+    console.log(error);
+    if (error) {
+      return res.status(400).send({ message: error.details[0].message });
+    }
     const {
       client_id,
       contract_id,
@@ -60,7 +71,7 @@ const updatePayment = async (req, res) => {
       payment_method,
       payment_time,
       status,
-    } = req.body;
+    } = value;
 
     await Payment.update(
       {

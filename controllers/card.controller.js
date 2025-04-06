@@ -1,9 +1,15 @@
-const { errorHandler } = require("../helpers/error.handler");
+const  errorHandler  = require("../helpers/error.handler");
 const Card = require("../models/card.model");
+const { cardValidation } = require("../validation/card.validation");
 
 const addCard = async (req, res) => {
   try {
-    const { number, date, user_id, card_type } = req.body;
+    const { error, value } = cardValidation(req.body);
+    console.log(error);
+    if (error) {
+      return res.status(400).send({ message: error.details[0].message });
+    }
+    const { number, date, user_id, card_type } = value;
     const newCard = await Card.create({
       number,
       date,
@@ -38,7 +44,12 @@ const getCardById = async (req, res) => {
 const updateCard = async (req, res) => {
   try {
     const { id } = req.params;
-    const { number, date, user_id, card_type } = req.body;
+    const { error, value } = cardValidation(req.body);
+    console.log(error);
+    if (error) {
+      return res.status(400).send({ message: error.details[0].message });
+    }
+    const { number, date, user_id, card_type } = value;
 
     await Card.update({ number, date, user_id, card_type }, { where: { id } });
     res.status(200).send({ message: "Card updated" });

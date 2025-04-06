@@ -4,20 +4,20 @@ const Owner = require("./owner.model");
 const Category = require("./category.model");
 
 const Product = sequelize.define("product", {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    model: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    status: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true,
-    },
-  });
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  model: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  status: {
+    type: DataTypes.ENUM("pending", "completed", "failed", "refunded"),
+    defaultValue: "pending",
+  },
+});
 
 Product.belongsTo(Owner,{foreignKey:"owner_id"})
 Owner.hasMany(Product)

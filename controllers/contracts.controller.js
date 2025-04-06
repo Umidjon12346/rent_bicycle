@@ -1,12 +1,17 @@
-const { errorHandler } = require("../helpers/error.handler");
+const errorHandler = require("../helpers/error.handler");
 const Client = require("../models/client.model");
 const Contract = require("../models/contracts.model");
 const Product = require("../models/product.model");
 const RentDuration = require("../models/rentduration.model");
-
+const { contractValidation } = require("../validation/contract.validation");
 
 const addContract = async (req, res) => {
   try {
+    const { error, value } = contractValidation(req.body);
+    console.log(error);
+    if (error) {
+      return res.status(400).send({ message: error.details[0].message });
+    }
     const {
       client_id,
       product_id,
@@ -15,7 +20,7 @@ const addContract = async (req, res) => {
       total_price,
       status_id,
       duration_id,
-    } = req.body;
+    } = value;
     const newContract = await Contract.create({
       client_id,
       product_id,
@@ -34,7 +39,7 @@ const addContract = async (req, res) => {
 const getAllContracts = async (req, res) => {
   try {
     const contracts = await Contract.findAll({
-      include: [Product, RentDuration,Client],
+      include: [Product, RentDuration, Client],
     });
     res.status(200).send({ contracts });
   } catch (error) {
@@ -46,7 +51,7 @@ const getContractById = async (req, res) => {
   try {
     const { id } = req.params;
     const contract = await Contract.findByPk(id, {
-      include: [Product, RentDuration,Client],
+      include: [Product, RentDuration, Client],
     });
     res.status(200).send({ contract });
   } catch (error) {
@@ -57,6 +62,11 @@ const getContractById = async (req, res) => {
 const updateContract = async (req, res) => {
   try {
     const { id } = req.params;
+    const { error, value } = contractValidation(req.body);
+    console.log(error);
+    if (error) {
+      return res.status(400).send({ message: error.details[0].message });
+    }
     const {
       client_id,
       product_id,
@@ -65,7 +75,7 @@ const updateContract = async (req, res) => {
       total_price,
       status_id,
       duration_id,
-    } = req.body;
+    } = value;
 
     await Contract.update(
       {

@@ -5,9 +5,9 @@ const config = require("config");
 const { errorHandler } = require("../../helpers/error.handler");
 
 module.exports = function (req, res, next) {
-  if (!req.user.is_creator) {
+  if (req.user.role !="admin") {
     throw ApiError.forbidden("Kirmisan");
-  }
+  } 
   next();
 };
 

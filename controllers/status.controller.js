@@ -1,9 +1,15 @@
-const { errorHandler } = require("../helpers/error.handler");
+const  errorHandler  = require("../helpers/error.handler");
 const Status = require("../models/status.model");
+const { statusValidation } = require("../validation/status.validation");
 
 const addStatus = async (req, res) => {
   try {
-    const { status } = req.body;
+    const { error, value } = statusValidation(req.body);
+    console.log(error);
+    if (error) {
+      return res.status(400).send({ message: error.details[0].message });
+    }
+    const { status } = value;
     const newStatus = await Status.create({
       status,
     });
@@ -34,8 +40,13 @@ const getStatusById = async (req, res) => {
 
 const updateStatus = async (req, res) => {
   try {
+     const { error, value } = statusValidation(req.body);
+     console.log(error);
+     if (error) {
+       return res.status(400).send({ message: error.details[0].message });
+     }
     const { id } = req.params;
-    const { status } = req.body;
+    const { status } = value;
 
     await Status.update(
       {

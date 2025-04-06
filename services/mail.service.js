@@ -22,8 +22,8 @@ class MailService {
       subject: "lugatim akkaunti faollasg",
       text: "",
       html: `
-        <div><h1>Akkatumni folasaa uchun linkni bossssss</h1>
-        <a href=${link}>Faollashrit</a>
+        <div><h1>Akkauntni ochish uchun linkni bosing</h1>
+        <a href=${link}>Faollashtirish</a>
         </div>
         `,
     });
