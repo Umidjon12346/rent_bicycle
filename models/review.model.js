@@ -24,9 +24,9 @@ const Review = sequelize.define("review", {
 });
 
 Review.belongsTo(Client, { foreignKey: "client_id" });
-Client.hasMany(Review)
+Client.hasMany(Review, { foreignKey: "client_id" });
 
 Review.belongsTo(Product, { foreignKey: "product_id" });
-Product.hasMany(Review)
+Product.hasMany(Review, { foreignKey: "product_id" });
 
 module.exports = Review;

@@ -1,7 +1,7 @@
 const { addReview, getAllReviews, getReviewById, deleteReview, updateReview } = require("../controllers/review.controller");
 const authGuard = require("../middleware/guards/auth.guard");
 const userAdminGuard = require("../middleware/guards/user.admin.guard");
-const userSelfGuard = require("../middleware/guards/user.self.guard");
+const userSelfGuard = require("../middleware/guards/client.self.guard");
 
 const router = require("express").Router();
 

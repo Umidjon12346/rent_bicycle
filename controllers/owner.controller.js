@@ -5,6 +5,9 @@ const uuid = require("uuid");
 const bcrypt = require("bcrypt");
 const config = require("config");
 const { ownerValidation } = require("../validation/owner.validation");
+const jwtService = require("../services/jwt.service");
+const Product = require("../models/product.model");
+const sequelize = require("../config/db");
 
 const addOwner = async (req, res) => {
   try {
@@ -16,7 +19,7 @@ const addOwner = async (req, res) => {
     const { full_name, phone, email, password, refresh_token, is_active } =
       value;
     const hashedpassword = bcrypt.hashSync(password, 7);
-    const activation_link = uuid.v4();
+
     const newOwner = await Owner.create({
       full_name,
       phone,
@@ -24,13 +27,8 @@ const addOwner = async (req, res) => {
       password: hashedpassword,
       refresh_token,
       is_active,
-      activation_link,
     });
 
-    await mailService.sendActivationMail(
-      newOwner.email,
-      `${config.get("api_url")}/api/owner/activate/${activation_link}`
-    );
     res.status(201).send({ message: "Owner created", newOwner });
   } catch (error) {
     errorHandler(error, res);
@@ -45,7 +43,6 @@ const getAllOwners = async (req, res) => {
     errorHandler(error, res);
   }
 };
-
 const getOwnerById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -87,6 +84,102 @@ const deleteOwner = async (req, res) => {
   }
 };
 
+const getTopRentingOwnersByCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+
+    const [results] = await sequelize.query(
+      `
+      SELECT 
+        o.id,
+        o.full_name,
+        COUNT(c.id) as rental_count,
+        o.phone,
+        o.email
+      FROM 
+        Owners o
+      JOIN 
+        Products p ON o.id = p.owner_id
+      JOIN 
+        Contracts c ON p.id = c.product_id
+      WHERE 
+        p.category_id = :categoryId
+      GROUP BY 
+        o.id, o.full_name, o.phone, o.email
+      ORDER BY 
+        rental_count DESC
+      LIMIT 10
+    `,
+      {
+        replacements: { categoryId },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+    console.log(results);
+    
+    res.status(200).json(results);
+  } catch (error) {
+    errorHandler(error, res);
+  }
+};
+
+
+
+
+
+// Regirterlar ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+const registerOwner = async (req, res) => {
+  try {
+    const { error, value } = ownerValidation(req.body);
+    console.log(error);
+    if (error) {
+      return res.status(400).send({ message: error.details[0].message });
+    }
+    const { full_name, phone, email, password, refresh_token, is_active } =
+      value;
+    const hashedpassword = bcrypt.hashSync(password, 7);
+    const activation_link = uuid.v4()
+    const owner = await Owner.create({
+      full_name,
+      phone,
+      email,
+      password: hashedpassword,
+      refresh_token,
+      is_active,
+      activation_link,
+    });
+
+    // const otp = await createOtp(client.email); // Emailga mos OTP yaratish
+    // // OTPni emailga yuborish
+    // await mailService.sendOtpMail(client.email, otp);
+
+    await mailService.sendActivationMail(
+      owner.email,
+      `${config.get("api_url")}/api/owner/activate/${activation_link}`
+    );
+
+    const payload = {
+      id: owner.id,
+      email: owner.email,
+      is_active: owner.is_active,
+      role: "owner",
+    };
+
+    const tokens = jwtService.generateTokens(payload);
+    owner.refresh_token = tokens.refreshToken;
+    await owner.save();
+    res.cookie("ownerRefreshToken", tokens.refreshToken, {
+      httpOnly: true,
+      maxAge: config.get("refresh_cookie_time"),
+    });
+
+    res
+      .status(201)
+      .send({ message: "Sizning Emailingizga xabar yuborildi", owner });
+  } catch (error) {
+    errorHandler(error, res);
+  }
+};
 const loginOwner = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -216,4 +309,7 @@ module.exports = {
   loginOwner,
   refreshTokenOwner,
   ownerActive,
+  getTopRentingOwnersByCategory,
+  registerOwner
+  // mostActiveOwnersByCategory
 };

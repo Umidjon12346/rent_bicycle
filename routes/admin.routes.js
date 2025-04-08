@@ -1,7 +1,6 @@
 const { addAdmin, getAllAdmins, getAdminById, updateAdmin, deleteAdmin, loginAdmin, logoutAdmin, refreshTokenAdmin } = require("../controllers/admin.controller");
 const authGuard = require("../middleware/guards/auth.guard");
 const userAdminGuard = require("../middleware/guards/user.admin.guard");
-const userSelfGuard = require("../middleware/guards/user.self.guard");
 
 const router = require("express").Router();
 

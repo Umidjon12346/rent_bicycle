@@ -1,5 +1,7 @@
-const  errorHandler  = require("../helpers/error.handler");
+const errorHandler = require("../helpers/error.handler");
 const Card = require("../models/card.model");
+const Client = require("../models/client.model");
+const Product = require("../models/product.model");
 const { cardValidation } = require("../validation/card.validation");
 
 const addCard = async (req, res) => {
@@ -9,11 +11,18 @@ const addCard = async (req, res) => {
     if (error) {
       return res.status(400).send({ message: error.details[0].message });
     }
-    const { number, date, user_id, card_type } = value;
+    const { number, date, client_id, card_type } = value;
+
+    const existingCard = await Card.findOne({ where: { number } });
+    if (existingCard) {
+      return res
+        .status(400)
+        .send({ message: "Bu karta raqami allaqachon mavjud" });
+    }
     const newCard = await Card.create({
       number,
       date,
-      user_id,
+      client_id,
       card_type,
     });
     res.status(201).send({ message: "Card created", newCard });
@@ -40,6 +49,19 @@ const getCardById = async (req, res) => {
     errorHandler(error, res);
   }
 };
+const getMyCards = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const cards = await Card.findAll({
+      where: { client_id: userId },
+      include: [Client],
+    });
+
+    res.status(200).send({ cards });
+  } catch (error) {
+    errorHandler(error, res); // Xatolikni qaytarish
+  }
+};
 
 const updateCard = async (req, res) => {
   try {
@@ -49,9 +71,12 @@ const updateCard = async (req, res) => {
     if (error) {
       return res.status(400).send({ message: error.details[0].message });
     }
-    const { number, date, user_id, card_type } = value;
+    const { number, date, client_id, card_type } = value;
 
-    await Card.update({ number, date, user_id, card_type }, { where: { id } });
+    await Card.update(
+      { number, date, client_id, card_type },
+      { where: { id } }
+    );
     res.status(200).send({ message: "Card updated" });
   } catch (error) {
     errorHandler(error, res);
@@ -68,9 +93,10 @@ const deleteCard = async (req, res) => {
   }
 };
 module.exports = {
-    addCard,
-    getAllCards,
-    getCardById,
-    deleteCard,
-    updateCard
-}
+  addCard,
+  getAllCards,
+  getCardById,
+  deleteCard,
+  updateCard,
+  getMyCards
+};

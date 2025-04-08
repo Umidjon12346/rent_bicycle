@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const config = require("config");
 const jwtService = require("../../services/jwt.service");
-const { errorHandler } = require("../../helpers/error.handler");
+const  errorHandler  = require("../../helpers/error.handler");
 
 module.exports = async function (req, res, next) {
   try {
@@ -18,6 +18,8 @@ module.exports = async function (req, res, next) {
     const decodedToken = await jwtService.verifyAccessToken(token);
     console.log(decodedToken);
     req.user = decodedToken
+    console.log(req.user);
+    
 
     next();
   } catch (error) {

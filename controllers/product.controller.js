@@ -33,6 +33,21 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+const getMyProducts = async (req, res) => {
+  try {
+    const ownerId = req.user.id; 
+    const products = await Product.findAll({
+      where: { owner_id: ownerId },
+      include: [Owner, Category],
+    });
+
+    res.status(200).send({ products });
+  } catch (error) {
+    errorHandler(error, res);
+  }
+};
+
+
 const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -85,4 +100,5 @@ module.exports = {
   getProductById,
   updateProduct,
   deleteProduct,
+  getMyProducts
 };

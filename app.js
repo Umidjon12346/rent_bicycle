@@ -3,6 +3,7 @@ const config = require("config");
 const mainRoute = require("./routes/index.routes");
 const cookieParser = require("cookie-parser");
 const sequelize = require("./config/db");
+const errorHandling = require("./middleware/errors/error.handling");
 
 const PORT = config.get("port") || 3004;
 
@@ -11,6 +12,7 @@ app.use(cookieParser());
 
 app.use(express.json());
 app.use("/api", mainRoute);
+app.use(errorHandling);
 
 async function start() {
   try {

@@ -9,12 +9,7 @@ const myFormat = printf(({ level, message, label, timestamp }) => {
 });
 
 const logger = createLogger({
-  format: combine(
-    label({ label: "rent" }),
-    timestamp(),
-    myFormat,
-    json()
-  ),
+  format: combine(label({ label: "rent" }), timestamp(), myFormat, json()),
   transports: [
     new transports.Console({ level: "debug" }),
     new transports.File({ filename: "log/error.log", level: "error" }),

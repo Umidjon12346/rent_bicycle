@@ -28,6 +28,20 @@ class MailService {
         `,
     });
   }
+  async sendOtpMail(toEmail, otp) {
+    await this.transporter.sendMail({
+      from: config.get("smtp_user"),
+      to: toEmail,
+      subject: "Tasdiqlash kodi (OTP)",
+      html: `
+        <div>
+          <h1>Sizning tasdiqlash kodingiz (OTP):</h1>
+          <h2 style="color: blue;">${otp}</h2>
+          <p>Bu kod 5 daqiqa davomida amal qiladi.</p>
+        </div>
+      `,
+    });
+  }
 }
 
 module.exports = new MailService();

@@ -29,7 +29,7 @@ Location.belongsTo(Product, { foreignKey: "product_id" });
 Product.hasMany(Location, { foreignKey: "product_id" });
 
 Location.belongsTo(Client, { foreignKey: "client_id" });
-Client.hasMany(Location)
+Client.hasMany(Location,{ foreignKey: "client_id" })
 
 module.exports = Location;
 

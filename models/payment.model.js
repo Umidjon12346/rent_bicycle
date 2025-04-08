@@ -10,14 +10,6 @@ const Payment = sequelize.define("payment", {
       primaryKey: true,
       autoIncrement: true,
     },
-    client_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    contract_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
     amount: {
       type: DataTypes.DECIMAL,
       allowNull: false,
@@ -39,10 +31,10 @@ const Payment = sequelize.define("payment", {
 
 
 Payment.belongsTo(Client, { foreignKey: "client_id" });
-Client.hasMany(Payment)
+Client.hasMany(Payment, { foreignKey: "client_id" });
 
 Payment.belongsTo(Contract, { foreignKey: "contract_id" });
-Contract.hasOne(Payment);
+Contract.hasOne(Payment, { foreignKey: "contract_id" });
 
 
 

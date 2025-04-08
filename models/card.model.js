@@ -28,6 +28,6 @@ const Card = sequelize.define(
 );
 
 Card.belongsTo(Client,{foreignKey:"client_id"});
-Client.hasMany(Card);
+Client.hasMany(Card, { foreignKey: "client_id" });
 
 module.exports = Card;

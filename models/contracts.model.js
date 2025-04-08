@@ -49,9 +49,9 @@ Contract.belongsTo(RentDuration, { foreignKey: "duration_id" });
 RentDuration.hasMany(Contract, { foreignKey: "duration_id" });
 
 Contract.belongsTo(Client,{foreignKey:"client_id"})
-Client.hasMany(Contract)
+Client.hasMany(Contract, { foreignKey: "client_id" });
 
 Contract.belongsTo(Status,{foreignKey:"status_id"})
-Status.hasOne(Contract)
+Status.hasMany(Contract, { foreignKey: "status_id" });
 
 module.exports = Contract;

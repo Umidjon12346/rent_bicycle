@@ -24,7 +24,7 @@ const Owner = sequelize.define("owner", {
     allowNull: false,
   },
   refresh_token: {
-    type: DataTypes.BIGINT,
+    type: DataTypes.STRING,
     allowNull: true,
   },
   is_active: {

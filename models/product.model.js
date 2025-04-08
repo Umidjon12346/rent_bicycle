@@ -20,9 +20,9 @@ const Product = sequelize.define("product", {
 });
 
 Product.belongsTo(Owner,{foreignKey:"owner_id"})
-Owner.hasMany(Product)
+Owner.hasMany(Product, { foreignKey: "owner_id" });
 
 Product.belongsTo(Category,{foreignKey:"category_id"})
-Category.hasMany(Product)
+Category.hasMany(Product, { foreignKey: "category_id" });
 
 module.exports = Product;
