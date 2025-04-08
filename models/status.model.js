@@ -9,7 +9,13 @@ const Status = sequelize.define("status", {
     autoIncrement: true,
   },
   status: {
-    type: DataTypes.ENUM("pending", "completed", "failed", "refunded"),
+    type: DataTypes.ENUM(
+      "pending",
+      "completed",
+      "failed",
+      "refunded",
+      "invalid"
+    ),
     defaultValue: "pending",
   },
 });

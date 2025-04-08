@@ -10,11 +10,11 @@ exports.productValidation = (body) => {
     }),
 
     status: Joi.string()
-      .valid("pending", "completed", "failed", "refunded")
+      .valid("pending", "completed", "failed", "refunded","invalid")
       .optional()
       .messages({
         "any.only":
-          "Status faqat: 'pending', 'completed', 'failed', yoki 'refunded' bo'lishi mumkin.",
+          "Status faqat: 'pending', 'completed', 'failed', 'refunded' yoki 'invalid' bo'lishi mumkin.",
         "string.base": "Status matn bo'lishi kerak.",
       }),
 

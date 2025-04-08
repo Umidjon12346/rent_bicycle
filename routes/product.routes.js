@@ -9,12 +9,12 @@ const Product = require("../models/product.model");
 
 const router = require("express").Router();
 
-router.post("/", authGuard, addProduct);
+router.post("/", authGuard,ownerGuard, addProduct);
 router.get("/", authGuard, getAllProducts);
 
-router.get("/my_product",authGuard,ownerGuard,getMyProducts)
-router.get("/:id", authGuard, ownerGuard,ownerSelfGuard(Product), getProductById);
-router.delete("/:id", authGuard, ownerGuard, deleteProduct);
-router.put("/:id", authGuard, ownerGuard, updateProduct);
+router.get("/my_product",authGuard,ownerGuard,getMyProducts);
+router.get("/:id", authGuard,  getProductById);
+router.delete("/:id", authGuard, ownerGuard,ownerSelfGuard(Product), deleteProduct);
+router.put("/:id", authGuard, ownerGuard,ownerSelfGuard(Product), updateProduct);
 
 module.exports = router;

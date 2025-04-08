@@ -56,11 +56,11 @@ const updateAdmin = async (req, res) => {
     if (error) {
       return res.status(400).send({ message: error.details[0].message });
     }
-    const { full_name, email, password, refresh_token, is_creator, is_active } =
+    const { full_name, email, password, is_creator, is_active } =
       value;
 
     await Admin.update(
-      { full_name, email, password, refresh_token, is_creator, is_active },
+      { full_name, email, password, is_creator, is_active },
       { where: { id } }
     );
     res.status(200).send({ message: "Admin updated" });

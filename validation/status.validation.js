@@ -3,7 +3,7 @@ const Joi = require("joi");
 exports.statusValidation = (body) => {
   const statusSchema = Joi.object({
     status: Joi.string()
-      .valid("pending", "completed", "failed", "refunded")
+      .valid("pending", "completed", "failed", "refunded", "invalid")
       .optional()
       .messages({
         "any.only":

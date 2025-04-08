@@ -10,7 +10,7 @@ module.exports = function (Model, idField = "id") {
         throw ApiError.notFound("Ma'lumot topilmadi");
       }
 
-      if (record.client_id !== req.user.id) {
+      if (record.id !== req.user.id && record.owner_id !== req.user.id) {
         throw ApiError.forbidden("Ruxsat yo'q");
       }
 

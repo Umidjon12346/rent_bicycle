@@ -1,4 +1,4 @@
-const { where } = require("sequelize");
+
 const ApiError = require("../../helpers/api.error");
 
 module.exports = function (Model, idField = "id") {
@@ -11,7 +11,7 @@ module.exports = function (Model, idField = "id") {
       console.log(record);
       
       if (!record) {
-        throw ApiError.notFound("Client ma'lumot topilmadi");
+        throw ApiError.notFound("Ma'lumot topilmadi");
       }
 
       if (record.id !== req.user.id && record.client_id !== req.user.id) {

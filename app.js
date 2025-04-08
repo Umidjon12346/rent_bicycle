@@ -12,6 +12,7 @@ app.use(cookieParser());
 
 app.use(express.json());
 app.use("/api", mainRoute);
+
 app.use(errorHandling);
 
 async function start() {

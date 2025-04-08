@@ -61,11 +61,11 @@ const updateOwner = async (req, res) => {
     if (error) {
       return res.status(400).send({ message: error.details[0].message });
     }
-    const { full_name, phone, email, password, refresh_token, is_active } =
+    const { full_name, phone, email, password, is_active } =
       value;
 
     await Owner.update(
-      { full_name, phone, email, password, refresh_token, is_active },
+      { full_name, phone, email, password, is_active },
       { where: { id } }
     );
     res.status(200).send({ message: "Owner updated" });
@@ -135,7 +135,7 @@ const registerOwner = async (req, res) => {
     if (error) {
       return res.status(400).send({ message: error.details[0].message });
     }
-    const { full_name, phone, email, password, refresh_token, is_active } =
+    const { full_name, phone, email, password, is_active } =
       value;
     const hashedpassword = bcrypt.hashSync(password, 7);
     const activation_link = uuid.v4()
@@ -144,7 +144,6 @@ const registerOwner = async (req, res) => {
       phone,
       email,
       password: hashedpassword,
-      refresh_token,
       is_active,
       activation_link,
     });

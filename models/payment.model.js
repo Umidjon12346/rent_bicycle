@@ -36,5 +36,5 @@ Client.hasMany(Payment, { foreignKey: "client_id" });
 Payment.belongsTo(Contract, { foreignKey: "contract_id" });
 Contract.hasOne(Payment, { foreignKey: "contract_id" });
 
-
+module.exports = Payment;
 

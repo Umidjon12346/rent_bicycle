@@ -1,7 +1,7 @@
 const { addStatus, getAllStatuses, getStatusById, deleteStatus, updateStatus } = require("../controllers/status.controller");
 const authGuard = require("../middleware/guards/auth.guard");
 const userAdminGuard = require("../middleware/guards/user.admin.guard");
-const userSelfGuard = require("../middleware/guards/client.self.guard");
+
 
 const router = require("express").Router();
 

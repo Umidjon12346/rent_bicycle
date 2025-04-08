@@ -3,6 +3,9 @@ const Payment = require("../models/payment.model");
 const Contract = require("../models/contracts.model");
 const Client = require("../models/client.model");
 const { paymentValidation } = require("../validation/payment.validation");
+const Owner = require("../models/owner.model");
+const Product = require("../models/product.model");
+const Category = require("../models/category.model");
 
 const addPayment = async (req, res) => {
   try {
@@ -101,10 +104,68 @@ const deletePayment = async (req, res) => {
   }
 };
 
+
+
+const getClientPayments = async (req, res) => {
+  try {
+    const { client_id } = req.body;
+
+    const payments = await Payment.findAll({
+      where: { client_id },
+      include: [
+        {
+          model: Contract,
+          include: [
+            {
+              model: Client,
+              attributes: ["first_name", "email"],
+            },
+            {
+              model: Product,
+              attributes: ["model"],
+              include: [
+                {
+                  model: Owner,
+                  attributes: ["full_name"],
+                },
+                {
+                  model: Category,
+                  attributes: ["name"],
+                },
+              ],
+            },
+          ],
+          attributes: [],
+        },
+      ],
+      attributes: ["amount", "payment_method", "payment_time", "status"],
+      raw: true,
+    });
+
+    const formatted = payments.map((p) => ({
+      client_name: p["contract.client.first_name"],
+      client_email: p["contract.client.email"],
+      category_name: p["contract.product.category.name"],
+      product_name: p["contract.product.model"],
+      owner_name: p["contract.product.owner.full_name"],
+      amount: p.amount,
+      payment_method: p.payment_method,
+      payment_time: p.payment_time,
+      status: p.status,
+    }));
+
+    res.status(200).send({ payments: formatted });
+  } catch (error) {
+    errorHandler(error, res);
+  }
+};
+
+
 module.exports = {
   addPayment,
   getAllPayments,
   getPaymentById,
   updatePayment,
   deletePayment,
+  getClientPayments
 };

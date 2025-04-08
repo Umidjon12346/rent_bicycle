@@ -14,7 +14,13 @@ const Product = sequelize.define("product", {
     allowNull: false,
   },
   status: {
-    type: DataTypes.ENUM("pending", "completed", "failed", "refunded"),
+    type: DataTypes.ENUM(
+      "pending",
+      "completed",
+      "failed",
+      "refunded",
+      "invalid"
+    ),
     defaultValue: "pending",
   },
 });

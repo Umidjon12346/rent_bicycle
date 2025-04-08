@@ -9,6 +9,7 @@ const uuid = require("uuid");
 const { clientValidation } = require("../validation/client.validation");
 const { createOtp } = require("./otp.controller");
 const { cli } = require("winston/lib/winston/config");
+const ApiError = require("../helpers/api.error");
 
 const addClient = async (req, res) => {
   try {
@@ -80,7 +81,6 @@ const updateClient = async (req, res) => {
       phone,
       email,
       password,
-      refresh_token,
       is_active,
     } = value;
 
@@ -91,7 +91,6 @@ const updateClient = async (req, res) => {
         phone,
         email,
         password,
-        refresh_token,
         is_active,
       },
       { where: { id } }
@@ -102,30 +101,33 @@ const updateClient = async (req, res) => {
   }
 };
 
-const updatePassword = async (req, res) => {
+const updatePassword = async (req, res, next) => {
   try {
-    const { email, password, new_password, confirm_password } = req.body;
-    const client = await Client.findOne({ where: { email } });
-    if (!client) {
-      return res.status(404).send({ message: "Client not found" });
-    }
+    const clientId = req.user.id;
+    console.log(clientId);
+    
+    const { password, new_password, confirm_password } = req.body;
 
-    const valuePassword = bcrypt.compareSync(password, client.password);
-    if (!valuePassword) {
-      return res.status(400).send({ message: "Parol xato" });
-    }
+    const client = await Client.findByPk(clientId);
+    if (!client) throw ApiError.notFound("Foydalanuvchi topilmadi");
 
+    
+    const isMatch = await bcrypt.compare(password, client.password);
+    if (!isMatch) throw ApiError.badRequest("Eski parol notogri");
+
+    
     if (new_password !== confirm_password) {
-      return res.status(400).send({ message: "Parol xato kiritildi" });
+      throw ApiError.badRequest("Yangi parollar bir xil emas");
     }
 
-    const hashedPassword = bcrypt.hashSync(new_password, 10);
+    const hashedPassword = await bcrypt.hash(new_password, 10);
+
     client.password = hashedPassword;
     await client.save();
 
-    res.status(200).send({ message: "Parol muvaffaqiyatli o'zgardi" });
+    res.status(200).send({ message: "Parol muvaffaqiyatli yangilandi" });
   } catch (error) {
-    errorHandler(error, res);
+    next(error);
   }
 };
 
