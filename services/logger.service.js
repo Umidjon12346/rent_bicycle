@@ -12,7 +12,7 @@ const logger = createLogger({
   format: combine(
     label({ label: "rent" }),
     timestamp(),
-    json() // faqat JSON, `printf` yo‘q
+    json()
   ),
   transports: [
     new transports.Console({ level: "debug" }),

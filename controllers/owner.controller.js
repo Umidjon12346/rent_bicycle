@@ -8,6 +8,7 @@ const { ownerValidation } = require("../validation/owner.validation");
 const jwtService = require("../services/jwt.service");
 const Product = require("../models/product.model");
 const sequelize = require("../config/db");
+const ApiError = require("../helpers/api.error");
 
 const addOwner = async (req, res) => {
   try {
@@ -47,11 +48,17 @@ const getOwnerById = async (req, res) => {
   try {
     const { id } = req.params;
     const owner = await Owner.findByPk(id);
+
+    if (!owner) {
+      return res.status(404).send({ message: "Owner not found" });
+    }
+
     res.status(200).send({ owner });
   } catch (error) {
     errorHandler(error, res);
   }
 };
+
 
 const updateOwner = async (req, res) => {
   try {
@@ -84,42 +91,31 @@ const deleteOwner = async (req, res) => {
   }
 };
 
-const getTopRentingOwnersByCategory = async (req, res) => {
+const updatePassword = async (req, res, next) => {
   try {
-    const { categoryId } = req.params;
+    const ownerId = req.user.id;
+    console.log(ownerId);
 
-    const [results] = await sequelize.query(
-      `
-      SELECT 
-        o.id,
-        o.full_name,
-        COUNT(c.id) as rental_count,
-        o.phone,
-        o.email
-      FROM 
-        Owners o
-      JOIN 
-        Products p ON o.id = p.owner_id
-      JOIN 
-        Contracts c ON p.id = c.product_id
-      WHERE 
-        p.category_id = :categoryId
-      GROUP BY 
-        o.id, o.full_name, o.phone, o.email
-      ORDER BY 
-        rental_count DESC
-      LIMIT 10
-    `,
-      {
-        replacements: { categoryId },
-        type: sequelize.QueryTypes.SELECT,
-      }
-    );
-    console.log(results);
-    
-    res.status(200).json(results);
+    const { password, new_password, confirm_password } = req.body;
+
+    const owner = await Owner.findByPk(ownerId);
+    if (!owner) throw ApiError.notFound("Foydalanuvchi topilmadi");
+
+    const isMatch = await bcrypt.compare(password, owner.password);
+    if (!isMatch) throw ApiError.badRequest("Eski parol notogri");
+
+    if (new_password !== confirm_password) {
+      throw ApiError.badRequest("Yangi parollar bir xil emas");
+    }
+
+    const hashedPassword = await bcrypt.hash(new_password, 10);
+
+    owner.password = hashedPassword;
+    await owner.save();
+
+    res.status(200).send({ message: "Parol muvaffaqiyatli yangilandi" });
   } catch (error) {
-    errorHandler(error, res);
+    next(error);
   }
 };
 
@@ -148,9 +144,9 @@ const registerOwner = async (req, res) => {
       activation_link,
     });
 
-    // const otp = await createOtp(client.email); // Emailga mos OTP yaratish
+    // const otp = await createOtp(owner.email); // Emailga mos OTP yaratish
     // // OTPni emailga yuborish
-    // await mailService.sendOtpMail(client.email, otp);
+    // await mailService.sendOtpMail(owner.email, otp);
 
     await mailService.sendActivationMail(
       owner.email,
@@ -308,7 +304,6 @@ module.exports = {
   loginOwner,
   refreshTokenOwner,
   ownerActive,
-  getTopRentingOwnersByCategory,
+  updatePassword,
   registerOwner
-  // mostActiveOwnersByCategory
 };

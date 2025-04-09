@@ -9,7 +9,8 @@ const router = require("express").Router();
 
 router.post("/", authGuard, addLocation);
 router.get("/", authGuard, getAllLocations);
-router.get("client/:id", authGuard,clientGuard, userSelfGuard(Location),  getLocationById);
+router.get("/client/:id", authGuard,clientGuard, userSelfGuard(Location),  getLocationById);
+router.get("/:id", authGuard, getLocationById);
 
 router.delete("/:id", authGuard, userAdminGuard, deleteLocation);
 router.put("/:id", authGuard,  updateLocation);

@@ -58,11 +58,54 @@ const getContractById = async (req, res) => {
     const contract = await Contract.findByPk(id, {
       include: [Product, RentDuration, Client],
     });
+
+    if (!contract) {
+      return res.status(404).send({ message: "Contract not found" });
+    }
+
     res.status(200).send({ contract });
   } catch (error) {
     errorHandler(error, res);
   }
 };
+
+const getAllMyContractsForOwner = async (req, res) => {
+  try {
+    const owner_id = req.user.id; 
+
+    const contracts = await Contract.findAll({
+      include: [
+        {
+          model: Product,
+          where: { owner_id },
+        },
+        RentDuration,
+        Client,
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    res.status(200).send({ contracts });
+  } catch (error) {
+    errorHandler(error, res);
+  }
+};
+
+const getAllMyContracts = async (req, res) => {
+  try {
+    const client_id = req.user.id; 
+
+    const contracts = await Contract.findAll({
+      where: { client_id },                   
+      include: [Product, RentDuration, Client]
+    });
+
+    res.status(200).send({ contracts });
+  } catch (error) {
+    errorHandler(error, res);
+  }
+};
+
 
 const updateContract = async (req, res) => {
   try {
@@ -265,5 +308,7 @@ module.exports = {
   getRentedProducts,
   getCancelledClients,
   getDamagedClients,
-  getTopOwnersByCategory
+  getTopOwnersByCategory,
+  getAllMyContractsForOwner,
+  getAllMyContracts
 };

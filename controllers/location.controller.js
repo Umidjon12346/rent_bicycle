@@ -43,11 +43,17 @@ const getLocationById = async (req, res) => {
     const location = await Location.findByPk(id, {
       include: [Product, Client],
     });
+
+    if (!location) {
+      return res.status(404).send({ message: "Location not found" });
+    }
+
     res.status(200).send({ location });
   } catch (error) {
     errorHandler(error, res);
   }
 };
+
 
 const updateLocation = async (req, res) => {
   try {

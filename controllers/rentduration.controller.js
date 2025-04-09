@@ -34,11 +34,17 @@ const getRentDurationById = async (req, res) => {
   try {
     const { id } = req.params;
     const rentDuration = await RentDuration.findByPk(id);
+
+    if (!rentDuration) {
+      return res.status(404).send({ message: "Rent duration not found" });
+    }
+
     res.status(200).send({ rentDuration });
   } catch (error) {
     errorHandler(error, res);
   }
 };
+
 
 const updateRentDuration = async (req, res) => {
   try {

@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const config = require("config");
 const jwtService = require("../services/jwt.service");
 const { adminValidation } = require("../validation/admin.validation");
+const ApiError = require("../helpers/api.error");
 
 const addAdmin = async (req, res) => {
   try {
@@ -66,6 +67,34 @@ const updateAdmin = async (req, res) => {
     res.status(200).send({ message: "Admin updated" });
   } catch (error) {
     errorHandler(error, res);
+  }
+};
+
+const updatePassword = async (req, res, next) => {
+  try {
+    const adminId = req.user.id;
+    console.log(adminId);
+
+    const { password, new_password, confirm_password } = req.body;
+
+    const admin = await Admin.findByPk(adminId);
+    if (!admin) throw ApiError.notFound("Foydalanuvchi topilmadi");
+
+    const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) throw ApiError.badRequest("Eski parol notogri");
+
+    if (new_password !== confirm_password) {
+      throw ApiError.badRequest("Yangi parollar bir xil emas");
+    }
+
+    const hashedPassword = await bcrypt.hash(new_password, 10);
+
+    admin.password = hashedPassword;
+    await admin.save();
+
+    res.status(200).send({ message: "Parol muvaffaqiyatli yangilandi" });
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -190,4 +219,5 @@ module.exports = {
   loginAdmin,
   logoutAdmin,
   refreshTokenAdmin,
+  updatePassword
 };

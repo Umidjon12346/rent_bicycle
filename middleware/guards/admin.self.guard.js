@@ -2,8 +2,8 @@ const ApiError = require("../../helpers/api.error");
 
 module.exports = (req, res, next) => {
   try {
-    const requestedId = req.params.id
-    const userId = req.user.id; 
+    const requestedId = parseInt(req.params.id); // yoki Number()
+    const userId = req.user.id;
 
     if (requestedId !== userId) {
       throw ApiError.forbidden(

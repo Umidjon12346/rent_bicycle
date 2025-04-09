@@ -32,11 +32,17 @@ const getStatusById = async (req, res) => {
   try {
     const { id } = req.params;
     const status = await Status.findByPk(id);
+
+    if (!status) {
+      return res.status(404).send({ message: "Status not found" });
+    }
+
     res.status(200).send({ status });
   } catch (error) {
     errorHandler(error, res);
   }
 };
+
 
 const updateStatus = async (req, res) => {
   try {

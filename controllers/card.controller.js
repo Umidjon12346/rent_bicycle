@@ -44,11 +44,17 @@ const getCardById = async (req, res) => {
   try {
     const { id } = req.params;
     const card = await Card.findByPk(id, { include: Client });
+
+    if (!card) {
+      return res.status(404).send({ message: "Card not found" });
+    }
+
     res.status(200).send({ card });
   } catch (error) {
     errorHandler(error, res);
   }
 };
+
 const getMyCards = async (req, res) => {
   try {
     const userId = req.user.id;

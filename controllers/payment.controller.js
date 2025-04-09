@@ -53,11 +53,17 @@ const getPaymentById = async (req, res) => {
     const payment = await Payment.findByPk(id, {
       include: [Client, Contract],
     });
+
+    if (!payment) {
+      return res.status(404).send({ message: "Payment not found" });
+    }
+
     res.status(200).send({ payment });
   } catch (error) {
     errorHandler(error, res);
   }
 };
+
 
 const updatePayment = async (req, res) => {
   try {

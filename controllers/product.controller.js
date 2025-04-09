@@ -52,11 +52,17 @@ const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
     const product = await Product.findByPk(id);
+
+    if (!product) {
+      return res.status(404).send({ message: "Product not found" });
+    }
+
     res.status(200).send({ product });
   } catch (error) {
     errorHandler(error, res);
   }
 };
+
 
 const updateProduct = async (req, res) => {
   try {

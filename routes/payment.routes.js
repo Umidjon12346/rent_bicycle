@@ -8,9 +8,9 @@ const Payment = require("../models/payment.model");
 const router = require("express").Router();
 
 router.post("/", authGuard,clientGuard, addPayment);
-router.get("/", authGuard, getAllPayments);
+router.get("/", authGuard,userAdminGuard, getAllPayments);
 
-router.get("/client-payments", getClientPayments);
+router.get("/client-payments",authGuard,clientGuard, getClientPayments);
 
 router.get("/:id", authGuard,clientGuard,userSelfGuard(Payment), getPaymentById);
 router.delete("/:id", authGuard, userAdminGuard, deletePayment);

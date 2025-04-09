@@ -41,11 +41,17 @@ const getReviewById = async (req, res) => {
     const review = await Review.findByPk(id, {
       include: [Client, Product],
     });
+
+    if (!review) {
+      return res.status(404).send({ message: "Review not found" });
+    }
+
     res.status(200).send({ review });
   } catch (error) {
     errorHandler(error, res);
   }
 };
+
 
 const updateReview = async (req, res) => {
   try {

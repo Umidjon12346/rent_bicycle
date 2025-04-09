@@ -8,8 +8,8 @@ const {
   loginOwner,
   refreshTokenOwner,
   logoutOwner,
-  getTopRentingOwnersByCategory,
   registerOwner,
+  updatePassword,
 } = require("../controllers/owner.controller");
 
 const authGuard = require("../middleware/guards/auth.guard");
@@ -22,8 +22,8 @@ const router = require("express").Router();
 
 router.post("/",authGuard,userAdminGuard, addOwner);
 router.get("/", authGuard, userAdminGuard, getAllOwners);
-// router.get("/top-owner/:categoryId", getTopRentingOwnersByCategory);
-router.get("/:id", authGuard, ownerGuard,ownerSelfGuard(Owner), getOwnerById);
+router.post("/update_pass",authGuard,updatePassword)
+router.get("/:id", authGuard,  getOwnerById);
 router.delete("/:id", authGuard, userAdminGuard, deleteOwner);
 router.put("/:id", authGuard,ownerGuard, ownerSelfGuard(Owner), updateOwner);
 

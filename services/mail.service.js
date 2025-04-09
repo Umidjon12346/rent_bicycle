@@ -19,7 +19,7 @@ class MailService {
     await this.transporter.sendMail({
       from: config.get("smtp_user"),
       to: toEmail,
-      subject: "lugatim akkaunti faollasg",
+      subject: "Akkauntni Faollashtirishy",
       text: "",
       html: `
         <div><h1>Akkauntni ochish uchun linkni bosing</h1>
